@@ -5,7 +5,10 @@
 
 extern Drive chassis;
 
-// Your motors, sensors, etc. should go here.  Below are examples
+inline pros::Motor intake(-20);
+inline pros::Motor outake(20);   // Intake motor on port 20
+inline pros::Motor lever(-14);   // Outake motor on port 14
 
-// inline pros::Motor intake(1);
-// inline pros::adi::DigitalIn limit_switch('A');
+inline ez::Piston matchload('B');  // Dropper piston on ADI port B
+inline ez::Piston forebar('A');      // Arm piston on ADI port A
+inline ez::Piston descore_wing('H');  // Descore wing on ADI port H
