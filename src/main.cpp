@@ -149,7 +149,7 @@ void opcontrol() {
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
   // chassis.opcontrol_tank();  // Tank control
   while (true) {
-    chassis.opcontrol_arcade_standard(ez::SPLIT);
+    chassis.opcontrol_tank();
     
     if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
       intake.move(127);
@@ -160,20 +160,33 @@ void opcontrol() {
       outake.move(0);
     }
 
-    // Outake Control (R1 = forward, R2 = reverse)
-    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+    // Outtake Control (R2 = forward while held, reverse briefly on release)
+    static bool r2_was_pressed = false;
+    static int r2_release_timer = 0;
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
       lever.move(127);
-    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+      r2_was_pressed = true;
+      r2_release_timer = 0;
+    } else if (r2_was_pressed && r2_release_timer < 15) {
       lever.move(-127);
+      r2_release_timer++;
     } else {
       lever.move(0);
+      r2_was_pressed = false;
     }
 
-    
-    descore_wing.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)); // D-Pad Right: Toggle descore wing
+    // Descore wing toggle (R1)
+    descore_wing.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1));
     // Pneumatic Controls (toggle - hold state)
     matchload.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_UP));    // D-Pad Up: Toggle dropper
     forebar.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN));      // D-Pad Down: Toggle arm
+
+    // Manual outtake control (LEFT = reverse, RIGHT = forward)
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
+      outake.move(-127);
+    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+      outake.move(127);
+    }
 
     // EZ-Template extras (PID tuner, test auton)
     ez_template_extras();
