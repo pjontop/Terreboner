@@ -25,3 +25,18 @@ void measure_offsets();
 
 void awp_auton();
 void skills_auton();
+void newskills_auton();
+void awp_wo_auton();
+void annajiwp();
+void right_auton();
+
+
+
+float weighted_distance(pros::Distance& sensor);
+void weighted_dist_reset();
+void simple_dist_reset();
+void drive_wall_track(double target_distance_in, int speed, pros::Distance& wall_sensor, float target_wall_distance_in);
+void intake_high(int voltage);
+void intake_middle(int voltage);
+void intake_low(int voltage);
+void moveto_matchload(int quadrant, int balls);

@@ -4,7 +4,9 @@
       "name": "PROS Project",
       "includePath": [
         "${workspaceFolder}/**",
-        "/Users/pj/Documents/Robotics/Terreboner/include"
+        "/Users/pj/Documents/Robotics/Terreboner/include",
+        "/Users/pj/Documents/Robotics/ashbury/include",
+        "/Users/pj/skibidiscreen/include"
       ],
       "defines": [
         "_DEBUG",
@@ -20,7 +22,7 @@
       ],
       "browse": {
         "path": [
-          "/Users/pj/Documents/Robotics/Terreboner"
+          "/Users/pj/skibidiscreen"
         ],
         "limitSymbolsToIncludedHeaders": true,
         "databaseFilename": ""

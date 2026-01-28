@@ -138,7 +138,12 @@ bin/autons/awp/awpAuton.cpp.o: src/autons/awp/awpAuton.cpp include/main.h \
  include/EZ-Template/tracking_wheel.hpp include/pros/adi.hpp \
  include/pros/rotation.hpp include/pros/motor_group.hpp \
  include/EZ-Template/piston.hpp include/EZ-Template/sdcard.hpp \
- include/autons.hpp include/subsystems.hpp
+ include/autons.hpp include/subsystems.hpp include/screen_ui.hpp \
+ include/main.h include/snapshot_pose/snapshot_bindings.hpp \
+ include/snapshot_pose/snapshot_pose.hpp include/pros/distance.hpp \
+ include/snapshot_pose/collision_map.hpp \
+ include/snapshot_pose/snapshot_pose_impl.hpp \
+ include/snapshot_pose/raycast.hpp
 include/main.h:
 include/api.h:
 include/pros/adi.h:
@@ -373,3 +378,11 @@ include/EZ-Template/piston.hpp:
 include/EZ-Template/sdcard.hpp:
 include/autons.hpp:
 include/subsystems.hpp:
+include/screen_ui.hpp:
+include/main.h:
+include/snapshot_pose/snapshot_bindings.hpp:
+include/snapshot_pose/snapshot_pose.hpp:
+include/pros/distance.hpp:
+include/snapshot_pose/collision_map.hpp:
+include/snapshot_pose/snapshot_pose_impl.hpp:
+include/snapshot_pose/raycast.hpp:
