@@ -241,4 +241,32 @@ SnapshotResult snapshot_correct_pose() {
   );
 }
 
+// -------------------------------
+// snapshot_set_offset: Set field coordinate offset for program zero
+// -------------------------------
+void snapshot_set_offset(float field_x_at_program_zero, float field_y_at_program_zero, float field_heading_at_program_zero) {
+  // This function allows you to define where (0,0,0) in your program corresponds to on the actual field
+  // For now, this is a placeholder - you could store these values and use them to transform
+  // the snapshot_correct_pose results if needed.
+  // 
+  // Typically, you would:
+  // 1. Store these offset values in static variables
+  // 2. Apply the transform in snapshot_correct_pose before calling chassis.odom_xyt_set()
+  //
+  // For basic usage, if your program coordinates already match field coordinates,
+  // you can leave this as a no-op.
+  
+  // Store in static variables for future use (optional)
+  static float offset_x = 0.0f;
+  static float offset_y = 0.0f;
+  static float offset_heading = 0.0f;
+  
+  offset_x = field_x_at_program_zero;
+  offset_y = field_y_at_program_zero;
+  offset_heading = field_heading_at_program_zero;
+  
+  // Print for debugging
+  pros::lcd::print(7, "Offset: (%.1f, %.1f, %.1f°)", offset_x, offset_y, offset_heading);
+}
+
 } // namespace snapshot_pose

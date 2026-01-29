@@ -4,12 +4,12 @@
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
     {-11, -6, -12},     // Left Chassis Ports (negative port will reverse it!)
-    {19, 10, 9},  // Right Chassis Ports (negative port will reverse it!)
+    {2, 10, 9},  // Right Chassis Ports (negative port will reverse it!)
     13,      // IMU Port
     4.125,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     600);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
-  ez::tracking_wheel horiz_tracker(-8, 2.125, -1.57);  // This tracking wheel is perpendicular to the drive wheels
+  // ez::tracking_wheel horiz_tracker(-8, 2.125, -1.57);  // This tracking wheel is perpendicular to the drive wheels
   ez::tracking_wheel vert_tracker(-18, 2.125, 0);   // This tracking wheel is parallel to the drive wheels
 
 void initialize() {
@@ -18,7 +18,7 @@ void initialize() {
 
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
 
-  chassis.odom_tracker_back_set(&horiz_tracker);
+  // chassis.odom_tracker_back_set(&horiz_tracker);
   chassis.odom_tracker_right_set(&vert_tracker);
 
   // Configure your chassis controls
@@ -31,7 +31,10 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
-      {"Skills\n\nFull Skills Auton", awp_auton},
+      {"SKILLS\n\nFull Skills Auton", skills_auton},
+      {"Annaji WP", annajiwp},
+      {"AWP WITHOUT ODOM\n\nSolo AWP, Start at the right", awp_wo_auton},
+      /*{"Skills\n\nFull Skills Auton", awp_auton},
       {"AWP\n\nSolo AWP, Start at the right", awp_auton},
       {"Drive\n\nDrive forward and come back", drive_example},
       {"Turn\n\nTurn 3 times.", turn_example},
@@ -46,9 +49,9 @@ void initialize() {
       {"Pure Pursuit Wait Until\n\nGo to (24, 24) but start running an intake once the robot passes (12, 24)", odom_pure_pursuit_wait_until_example},
       {"Boomerang\n\nGo to (0, 24, 45) then come back to (0, 0, 0)", odom_boomerang_example},
       {"Boomerang Pure Pursuit\n\nGo to (0, 24, 45) on the way to (24, 24) then come back to (0, 0, 0)", odom_boomerang_injected_pure_pursuit_example},
-      {"Measure Offsets\n\nThis will turn the robot a bunch of times and calculate your offsets for your tracking wheels.", measure_offsets},
+      {"Measure Offsets\n\nThis will turn the robot a bunch of times and calculate your offsets for your tracking wheels.", measure_offsets}, */
   });
-
+ 
   // Initialize chassis and auton selector
   chassis.initialize();
   ez::as::initialize();
@@ -166,30 +169,45 @@ void opcontrol() {
     // Outtake Control (R2 = forward while held, reverse briefly on release)
     static bool r2_was_pressed = false;
     static int r2_release_timer = 0;
-    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
-      lever.move(127);
-      r2_was_pressed = true;
-      r2_release_timer = 0;
-    } else if (r2_was_pressed && r2_release_timer < 15) {
+    bool manual_lever_control = false;
+    
+    // Manual outtake control (LEFT = reverse, RIGHT = forward) - has priority
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
       lever.move(-127);
-      r2_release_timer++;
-    } else {
-      lever.move(0);
       r2_was_pressed = false;
+      r2_release_timer = 0;
+      manual_lever_control = true;
+    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+      lever.move(127);
+      r2_was_pressed = false;
+      r2_release_timer = 0;
+      manual_lever_control = true;
     }
-
+    
+    // R2 automatic control (only if manual control not active)
+    if (!manual_lever_control) {
+      if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+        lever.move(127);
+        r2_was_pressed = true;
+        r2_release_timer = 0;
+      } else if (r2_was_pressed && r2_release_timer < 30) {  // Extended to 30 (~300ms)
+        if (r2_release_timer < 20) {
+          lever.move(-127);  // Fast reverse for first 200ms
+        } else {
+          lever.move(-40);   // Slow hold to prevent bounce for remaining 100ms
+        }
+        r2_release_timer++;
+      } else {
+        lever.move(0);
+        r2_was_pressed = false;
+      }
+    }
+    
     // Descore wing toggle (R1)
     descore_wing.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1));
     // Pneumatic Controls (toggle - hold state)
     matchload.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_UP));    // D-Pad Up: Toggle dropper
     forebar.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN));      // D-Pad Down: Toggle arm
-
-    // Manual outtake control (LEFT = reverse, RIGHT = forward)
-    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
-      outake.move(-127);
-    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
-      outake.move(127);
-    }
 
     // EZ-Template extras (PID tuner, test auton)
     ez_template_extras();
